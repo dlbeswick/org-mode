@@ -1103,6 +1103,16 @@ so long."
   "Reset `org-clock-current-task' to nil."
   (setq org-clock-current-task nil))
 
+(defun org-clock-heading-function-default ()
+  "The default function used to calculate the text in the mode line when a task is clocked in."
+  (cond ((and (looking-at org-complex-heading-regexp)
+	      (match-string 4))
+	 (replace-regexp-in-string
+	  "\\[\\[.*?\\]\\[\\(.*?\\)\\]\\]" "\\1"
+	  (match-string 4)))
+	(t "???")))
+
+
 (defvar org-clock-out-time nil) ; store the time of the last clock-out
 
 ;;;###autoload
@@ -1220,12 +1230,7 @@ make this the default behavior.)"
 		  (cond ((and org-clock-heading-function
 			      (functionp org-clock-heading-function))
 			 (funcall org-clock-heading-function))
-			((and (looking-at org-complex-heading-regexp)
-			      (match-string 4))
-			 (replace-regexp-in-string
-			  "\\[\\[.*?\\]\\[\\(.*?\\)\\]\\]" "\\1"
-			  (match-string 4)))
-			(t "???")))
+			((org-clock-heading-function-default))))
 	    (setq org-clock-heading (org-propertize org-clock-heading
 						    'face nil))
 	    (org-clock-find-position org-clock-in-resume)
